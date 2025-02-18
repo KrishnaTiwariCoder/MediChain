@@ -1,28 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { getWeb3 } from "@/lib/web3";
-import {
-  Activity,
-  Heart,
-  Droplets,
-  Timer,
-  Shield,
-  Stethoscope,
-  Clock,
-  Users,
-  FileText,
-} from "lucide-react";
-import { useWallet } from "@/lib/wallet-context";
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { getWeb3 } from '@/lib/web3';
+import { Activity, Heart, Droplets, Timer, Shield, Stethoscope, Clock, Users, FileText } from 'lucide-react';
+import { useWallet } from '@/lib/wallet-context';
+import { RoleSelection } from './role-selection';
+import DoctorDashboard from './doctor/page';
 
 export default function Home() {
-  const { account, setAccount } = useWallet();
+  const { account, setAccount, role } = useWallet();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(false);
+    const connectWallet = async () => {
+      try {
+        const web3 = await getWeb3();
+        const accounts = await web3.eth.getAccounts();
+        setAccount(accounts[0]);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    connectWallet();
   }, [setAccount]);
 
   if (loading) {
@@ -39,13 +43,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-16">
           {/* Hero Section */}
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold mb-6">
-              Secure Medical Records on the Blockchain
-            </h1>
+            <h1 className="text-5xl font-bold mb-6">Secure Medical Records on the Blockchain</h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Take control of your healthcare data with our decentralized
-              medical records platform. Secure, accessible, and always under
-              your control.
+              Take control of your healthcare data with our decentralized medical records platform.
+              Secure, accessible, and always under your control.
             </p>
             <Button
               size="lg"
@@ -73,8 +74,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Secure Storage</h3>
                 <p className="text-muted-foreground">
-                  Your medical records are encrypted and stored on the
-                  blockchain
+                  Your medical records are encrypted and stored on the blockchain
                 </p>
               </div>
             </Card>
@@ -84,9 +84,7 @@ export default function Home() {
                 <div className="bg-primary/10 p-4 rounded-full mb-4">
                   <Stethoscope className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  Doctor Integration
-                </h3>
+                <h3 className="text-xl font-semibold mb-2">Doctor Integration</h3>
                 <p className="text-muted-foreground">
                   Seamlessly share records with healthcare providers
                 </p>
@@ -98,9 +96,7 @@ export default function Home() {
                 <div className="bg-primary/10 p-4 rounded-full mb-4">
                   <Clock className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  Real-time Monitoring
-                </h3>
+                <h3 className="text-xl font-semibold mb-2">Real-time Monitoring</h3>
                 <p className="text-muted-foreground">
                   Track vital signs and health metrics in real-time
                 </p>
@@ -158,14 +154,23 @@ export default function Home() {
     );
   }
 
-  // Dashboard view for connected users
+  if (!role) {
+
+    return <RoleSelection />;
+  }
+  console.log(role)
+  if (role === 'doctor') {
+    return <DoctorDashboard />;
+  }
+
+  // Patient dashboard view for connected users
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Welcome Back!</h1>
           <p className="text-muted-foreground">
-            Here&apos;s an overview of your health metrics and recent activity
+            Here's an overview of your health metrics and recent activity
           </p>
         </div>
 
@@ -216,57 +221,39 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-4">Recent Documents</h2>
             <div className="space-y-4">
               {[
-                { title: "Blood Test Results", date: "2024-03-15" },
-                { title: "X-Ray Report", date: "2024-03-10" },
-                { title: "Prescription", date: "2024-03-05" },
+                { title: 'Blood Test Results', date: '2024-03-15' },
+                { title: 'X-Ray Report', date: '2024-03-10' },
+                { title: 'Prescription', date: '2024-03-05' },
               ].map((doc, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <FileText className="h-5 w-5 text-muted-foreground" />
                     <span>{doc.title}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {doc.date}
-                  </span>
+                  <span className="text-sm text-muted-foreground">{doc.date}</span>
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4">
-              View All Documents
-            </Button>
+            <Button variant="outline" className="w-full mt-4">View All Documents</Button>
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">
-              Upcoming Appointments
-            </h2>
+            <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
             <div className="space-y-4">
               {[
-                {
-                  doctor: "Dr. Sarah Johnson",
-                  date: "2024-03-20",
-                  time: "10:00 AM",
-                },
-                {
-                  doctor: "Dr. Michael Chen",
-                  date: "2024-03-25",
-                  time: "2:30 PM",
-                },
+                { doctor: 'Dr. Sarah Johnson', date: '2024-03-20', time: '10:00 AM' },
+                { doctor: 'Dr. Michael Chen', date: '2024-03-25', time: '2:30 PM' },
               ].map((apt, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{apt.doctor}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {apt.date} at {apt.time}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{apt.date} at {apt.time}</p>
                   </div>
                   <Button size="sm">Reschedule</Button>
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4">
-              View All Appointments
-            </Button>
+            <Button variant="outline" className="w-full mt-4">View All Appointments</Button>
           </Card>
         </div>
       </div>

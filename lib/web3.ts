@@ -15,9 +15,8 @@ export const ipfsClient = create({
     authorization: auth,
   },
 });
-
 // Smart contract configuration
-export const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+export const contractAddress ="0x3494401703A98110f5a7968bABe598cfe224a31b";
 export const contractABI = []; // Add your contract ABI here
 
 export const getWeb3 = async () => {

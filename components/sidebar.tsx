@@ -79,7 +79,7 @@ export function Sidebar() {
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-secondary/10 border-r">
       <div className="px-3 py-2">
-        <h2 className="mb-2 px-4 text-lg font-semibold">Medical DApp</h2>
+        <h2 className="mb-2 px-4 text-lg font-semibold">MediChain</h2>
         <div className="space-y-1">
           {routes.map((route) => (
             <Link
